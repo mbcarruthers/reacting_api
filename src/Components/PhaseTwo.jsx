@@ -32,13 +32,12 @@ export default class PhaseTwo extends Component {
             shouldShow : true
         });
     }
-
     render() {
         if(this.state.shouldShow) {
             const films = this.state.films.map( (film , index) => {
                 return(
                     <li key={index}>
-                        <div className="card mt-3 shadow">
+                        <div className="card mt-3 shadow-sm">
                             <div className="card-title text-center"><h3>{film.title}</h3></div>
                             <div className="card-body"><p>{film.description}</p></div>
                         </div>
@@ -55,7 +54,7 @@ export default class PhaseTwo extends Component {
             );
         } else {
             return(
-                <div className="container text-center">
+                <div className="container-fluid text-center">
                     <Ghibli />
                     <button className="btn btn-primary" onClick={this.handleClick}>
                         Load Films
