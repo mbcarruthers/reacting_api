@@ -84,7 +84,10 @@ export default class PhaseThree extends Component {
                 </div>
             )
         } else if(this.state.showPeople) {
-            fetch("http://ghibliapi.herokuapp.com/people/")
+            let count = 0; // count property to see how many times this is running, got kicked out before i could see
+                            // what is says
+            fetch("http://ghibliapi.herokuapp.com/people/") // something about this code, which is almost
+                                                                   // which is just about the same thing as the load films
                 .then( (res) => {
                     return res.json();
                 }).then( (object) => {
@@ -92,7 +95,8 @@ export default class PhaseThree extends Component {
                         this.setState({
                             people : [item , ...this.state.people]
                         })
-                    })
+                    });
+                    ++count;
             });
             const people_cards = this.state.people.map( (item , index) => {
                return(
@@ -100,20 +104,20 @@ export default class PhaseThree extends Component {
                        <div className="mt-3 card shadow-sm">
                            <div className="card-title text-center"><h5>{ item.name }</h5></div>
                            <div className="card-body text-center">
-                               <h5>{ item.gender }</h5>
+                               <p className="text-center">{ count }</p>
                            </div>
                        </div>
                    </li>
                )
             });
-            console.log(people_cards);
+
             return(
                 <div className="container-fluid text-center">
                     <Ghibli />
                     <button className="btn btn-primary m-3" onClick={this.handleFilms}>Load Films</button>
                     <button className="btn btn-primary" onClick={this.handlePeople}>Load People</button>
                     <ul className="list-unstyled">
-                        {/*{people_cards}*/}
+                        {people_cards}
                     </ul>
                 </div>
             )
