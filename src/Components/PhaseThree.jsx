@@ -7,7 +7,8 @@ export default class PhaseThree extends Component {
         this.state = {
             films : [] ,
             showPeople : false ,
-            showFilms : false
+            showFilms : false ,
+            people : []
         };
         this.handleFilms = this.handleFilms.bind(this);
         this.handlePeople = this.handlePeople.bind(this);
@@ -24,7 +25,7 @@ export default class PhaseThree extends Component {
                 return res.json();
             }).then( (object) => {
             object.forEach( (item) => {
-                console.log(item);
+                // console.log(item);
                 this.addFilm(item);
             })
         })
@@ -41,24 +42,16 @@ export default class PhaseThree extends Component {
             showFilms : false
         })
     }
-
-    // this fucking function
-    fetchPeople() {
-       const people = [];
-           this.state.films.map( (item , index) => {
-
-           fetch(item.people)
-               .then( (res) => {
-                   return res.json();
-               }).then( (object) => {
-                   people[index] = object;
-           }).catch( (error) => {
-               console.log(`${error}!!!`);
-           })
-       });
+    // not being used ATM
+    async fetchPeople() {
+        const people = await fetch("http://ghibliapi.herokuapp.com/people")
+            .then( (res) => {
+                return res.json();
+            }).then( (object) => {
+            return object;
+        });
         return people;
     }
-
     render() {
         if( !this.state.showPeople && !this.state.showFilms) {
             return(
@@ -91,26 +84,29 @@ export default class PhaseThree extends Component {
                 </div>
             )
         } else if(this.state.showPeople) {
-            // this bullshit
-            const people = this.fetchPeople();
-            const people_cards = people.map( (person,index) => {
-                console.log(person);
-                const link = "https://ghibliapi.herokuapp.com/films" + person.id;
-                return(
-                    <li key={person.id}>
-                        <div className="card m-3 shadow-sm">
-                            <div className="card-body">
-                                <h5>{person.name}</h5>
-                                <p>Gender: {person.gender}</p>
-                                <p>Age: {person.age}</p>
-                                <a href={link}>{person.name}'s link</a>
-
-                            </div>
-                        </div>
-                    </li>
-                )
+            fetch("http://ghibliapi.herokuapp.com/people/")
+                .then( (res) => {
+                    return res.json();
+                }).then( (object) => {
+                    object.forEach( (item) => {
+                        this.setState({
+                            people : [item , ...this.state.people]
+                        })
+                    })
             });
-
+            const people_cards = this.state.people.map( (item , index) => {
+               return(
+                   <li key={index}>
+                       <div className="mt-3 card shadow-sm">
+                           <div className="card-title text-center"><h5>{ item.name }</h5></div>
+                           <div className="card-body text-center">
+                               <h5>{ item.gender }</h5>
+                           </div>
+                       </div>
+                   </li>
+               )
+            });
+            console.log(people_cards);
             return(
                 <div className="container-fluid text-center">
                     <Ghibli />
