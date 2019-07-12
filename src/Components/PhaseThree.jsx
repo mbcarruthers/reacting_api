@@ -1,6 +1,6 @@
 import React , { Component } from "react";
 import Ghibli from "./Ghibli.jsx";
-
+let count = 0; // variable to see how often something is running , needs to be global for now
 export default class PhaseThree extends Component {
     constructor(props) {
         super(props);
@@ -19,39 +19,50 @@ export default class PhaseThree extends Component {
             films : [film , ...this.state.films]
         })
     }
+
+    addPerson( person ) {
+        this.setState({
+            people : [person , ...this.state.people]
+        })
+    }
+
     componentDidMount() {
         fetch("https://ghibliapi.herokuapp.com/films")
             .then( ( res ) => {
                 return res.json();
             }).then( (object) => {
             object.forEach( (item) => {
-                // console.log(item);
                 this.addFilm(item);
             })
-        })
+        });
+        fetch("http://ghibliapi.herokuapp.com/people")
+            .then( (res) => {
+                return res.json();
+            }).then( (object) => {
+            object.forEach( (item) => {
+                this.addPerson( item );
+            });
+            ++count;
+            console.log(count);
+        }).catch( (error) => {
+            console.log(`There has been an ERROR!! ${error}`);
+        });
     }
+
     handleFilms() {
         this.setState({
             showFilms : true,
             showPeople : false
         })
     }
+
     handlePeople() {
         this.setState({
             showPeople : true,
             showFilms : false
         })
     }
-    // not being used ATM
-    async fetchPeople() {
-        const people = await fetch("http://ghibliapi.herokuapp.com/people")
-            .then( (res) => {
-                return res.json();
-            }).then( (object) => {
-            return object;
-        });
-        return people;
-    }
+
     render() {
         if( !this.state.showPeople && !this.state.showFilms) {
             return(
@@ -68,13 +79,13 @@ export default class PhaseThree extends Component {
                         <div className="card mt-3 shadow-sm">
                             <div className="card-title text-center"><h3>{film.title}</h3></div>
                             <div className="card-body"><p>{film.description}</p></div>
-                            <a href={film.people}>people</a>
+                            {/*<a href={film.people}>people</a>*/}
                         </div>
                     </li>
                 )
             });
             return(
-                <div className="container-fluid text-center">
+                <div className="container-fluid text-center bg-info">
                     <Ghibli />
                     <button className="btn btn-primary m-3" onClick={this.handleFilms}>Load Films</button>
                     <button className="btn btn-primary" onClick={this.handlePeople}>Load People</button>
@@ -84,35 +95,22 @@ export default class PhaseThree extends Component {
                 </div>
             )
         } else if(this.state.showPeople) {
-            let count = 0; // count property to see how many times this is running, got kicked out before i could see
-                            // what is says
-            fetch("http://ghibliapi.herokuapp.com/people/") // something about this code, which is almost
-                                                                   // which is just about the same thing as the load films
-                .then( (res) => {
-                    return res.json();
-                }).then( (object) => {
-                    object.forEach( (item) => {
-                        this.setState({
-                            people : [item , ...this.state.people]
-                        })
-                    });
-                    ++count;
-            });
             const people_cards = this.state.people.map( (item , index) => {
+
                return(
                    <li key={index}>
                        <div className="mt-3 card shadow-sm">
-                           <div className="card-title text-center"><h5>{ item.name }</h5></div>
+                           <div className="card-title text-center"><h5>Name: { item.name }</h5></div>
                            <div className="card-body text-center">
-                               <p className="text-center">{ count }</p>
+                               <p className="text-center">Gender: { item.gender }</p>
+                               <a href={item.url} target="_blank"> {item.name} Link</a>
                            </div>
                        </div>
                    </li>
                )
             });
-
             return(
-                <div className="container-fluid text-center">
+                <div className="container-fluid text-center bg-danger">
                     <Ghibli />
                     <button className="btn btn-primary m-3" onClick={this.handleFilms}>Load Films</button>
                     <button className="btn btn-primary" onClick={this.handlePeople}>Load People</button>
